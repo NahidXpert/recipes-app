@@ -1,4 +1,4 @@
-const APP_CACHE = 'gather-thyme-app-v1'
+const APP_CACHE = 'gather-thyme-app-v2'
 const API_CACHE = 'gather-thyme-api-v1'
 const IMAGE_CACHE = 'gather-thyme-images-v1'
 const OWNED_CACHES = [APP_CACHE, API_CACHE, IMAGE_CACHE]
@@ -42,10 +42,16 @@ async function cacheAppShell() {
   await cache.put('/index.html', response.clone())
 
   const html = await response.text()
-  const resources = [...html.matchAll(/(?:src|href)="([^"]+\.(?:js|css)(?:\?[^"]*)?)"/g)]
-    .map((match) => new URL(match[1], self.location.origin))
-    .filter((url) => url.origin === self.location.origin)
-  await Promise.all(resources.map(async (url) => {
+  const resources = [
+    ...[...html.matchAll(/(?:src|href)="([^"]+\.(?:js|css|png|webmanifest)(?:\?[^"]*)?)"/g)].map((match) => match[1]),
+    '/site.webmanifest',
+    '/android-chrome-192x192.png',
+    '/android-chrome-512x512.png',
+    '/maskable_icon_x512.png',
+  ]
+  const uniqueResources = [...new Set(resources)]
+  await Promise.all(uniqueResources.map(async (path) => {
+    const url = new URL(path, self.location.origin)
     const asset = await fetch(url)
     if (asset.ok) await cache.put(url.href, asset)
   }))

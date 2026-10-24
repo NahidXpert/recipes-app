@@ -12,6 +12,7 @@ Gather & Thyme is a responsive recipe discovery app built with React and powered
 - Switch between light and dark themes. Your selection is saved in local storage; on first visit, the app follows your device’s color-scheme preference.
 - Offline support in production: the app shell and visited API responses are cached, loaded MealDB images are reused from cache, and saved favorites include their complete recipe details in IndexedDB.
 - Connectivity alerts announce when the browser goes offline and when it reconnects.
+- Installable web app metadata with 192px, 512px, and maskable 512px icons.
 - Responsive navigation and layouts, keyboard focus indicators, and loading, empty, and error states.
 
 ## Requirements

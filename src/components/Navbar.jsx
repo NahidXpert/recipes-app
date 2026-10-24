@@ -15,7 +15,7 @@ export default function Navbar() {
     <header className="site-header">
       <nav className="navbar container" aria-label="Main navigation">
         <Link className="brand" to="/" onClick={closeMenu}>
-          <span className="brand-mark" aria-hidden="true">g.</span>
+          <img className="brand-mark" src="/android-chrome-192x192.png" alt="" aria-hidden="true" />
           <span>gather<span className="brand-amp">&</span>thyme</span>
         </Link>
         <button className="mobile-menu-toggle" type="button" onClick={() => setMenuOpen(!menuOpen)} aria-expanded={menuOpen} aria-label={menuOpen ? 'Close menu' : 'Open menu'}>

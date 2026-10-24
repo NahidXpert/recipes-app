@@ -115,7 +115,7 @@ export default function Home() {
         </section>
       </main>
       <footer className="site-footer">
-        <div className="container footer-inner"><Link className="brand" to="/"><span className="brand-mark">g.</span><span>gather<span className="brand-amp">&</span>thyme</span></Link><span>Made for the love of good food.</span><span>Recipes powered by <a href="https://www.themealdb.com/" target="_blank" rel="noreferrer">TheMealDB</a></span></div>
+        <div className="container footer-inner"><Link className="brand" to="/"><img className="brand-mark" src="/android-chrome-192x192.png" alt="" aria-hidden="true" /><span>gather<span className="brand-amp">&</span>thyme</span></Link><span>Made for the love of good food.</span><span>Recipes powered by <a href="https://www.themealdb.com/" target="_blank" rel="noreferrer">TheMealDB</a></span></div>
       </footer>
     </>
   )
