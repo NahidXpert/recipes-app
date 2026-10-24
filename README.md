@@ -56,6 +56,17 @@ npm run build
 npm run preview
 ```
 
+## Deploy to Vercel
+
+Import this project into Vercel with the project root set to this directory. Vercel should detect Vite automatically. Use these settings if configuring the project manually:
+
+- **Framework preset:** Vite
+- **Build command:** `npm run build`
+- **Output directory:** `dist`
+- **Install command:** `npm install`
+
+The included `vercel.json` rewrites app routes to `index.html`, so recipe detail and other React Router URLs work when opened directly. The app has no custom backend server; recipe requests go directly to TheMealDB.
+
 ## Technology
 
 - React and Vite
