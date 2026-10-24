@@ -1,11 +1,14 @@
-import { Heart, Menu, Search, X } from 'lucide-react'
+import { Heart, Menu, Moon, Search, Sun, X } from 'lucide-react'
 import { useState } from 'react'
 import { Link, NavLink } from 'react-router-dom'
 import { useFavorites } from '../hooks/useFavorites'
+import { useTheme } from '../hooks/useTheme'
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false)
   const { favorites } = useFavorites()
+  const { theme, toggleTheme } = useTheme()
+  const nextTheme = theme === 'light' ? 'dark' : 'light'
   const closeMenu = () => setMenuOpen(false)
 
   return (
@@ -25,6 +28,10 @@ export default function Navbar() {
           <NavLink to="/favorites" onClick={closeMenu} className="nav-favorites">
             <Heart size={16} /> Favorites{favorites.length > 0 && <span className="favorite-count">{favorites.length}</span>}
           </NavLink>
+          <button className="theme-toggle" type="button" onClick={toggleTheme} aria-label={`Switch to ${nextTheme} mode`} aria-pressed={theme === 'dark'}>
+            {theme === 'light' ? <Moon size={16} /> : <Sun size={16} />}
+            <span>{theme === 'light' ? 'Dark mode' : 'Light mode'}</span>
+          </button>
           <Link className="nav-mobile-search" to="/explore" onClick={closeMenu}><Search size={16} /> Search recipes</Link>
         </div>
       </nav>

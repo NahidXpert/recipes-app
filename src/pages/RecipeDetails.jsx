@@ -3,15 +3,18 @@ import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { ErrorMessage, Loading, EmptyState } from '../components/Feedback'
 import { useFavorites } from '../hooks/useFavorites'
+import { getSavedRecipe } from '../services/favoriteStorage'
 import { getMeal } from '../services/mealDb'
 import { getIngredients, getInstructions } from '../utils/ingredients'
 
 export default function RecipeDetails() {
   const { id } = useParams()
   const navigate = useNavigate()
-  const { isFavorite, toggleFavorite } = useFavorites()
+  const { isFavorite, toggleFavorite, ready } = useFavorites()
   const [meal, setMeal] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [savingFavorite, setSavingFavorite] = useState(false)
+  const [favoriteError, setFavoriteError] = useState('')
   const [error, setError] = useState('')
   const [attempt, setAttempt] = useState(0)
 
@@ -19,12 +22,35 @@ export default function RecipeDetails() {
     let active = true
     setLoading(true)
     setError('')
-    getMeal(id)
-      .then((result) => {
-        if (active) setMeal(result)
-      })
-      .catch((requestError) => { if (active) setError(requestError.message) })
-      .finally(() => { if (active) setLoading(false) })
+    async function loadRecipe() {
+      try {
+        const result = await getMeal(id)
+        if (active && result) {
+          setMeal(result)
+          return
+        }
+        const savedRecipe = await getSavedRecipe(id)
+        if (active && savedRecipe) {
+          setMeal(savedRecipe)
+          return
+        }
+        if (active) setMeal(null)
+      } catch (requestError) {
+        try {
+          const savedRecipe = await getSavedRecipe(id)
+          if (active && savedRecipe) {
+            setMeal(savedRecipe)
+            return
+          }
+        } catch (storageError) {
+          console.error('Could not load the saved offline recipe.', storageError)
+        }
+        if (active) setError(requestError.message)
+      } finally {
+        if (active) setLoading(false)
+      }
+    }
+    loadRecipe()
     return () => { active = false }
   }, [id, attempt])
 
@@ -36,6 +62,18 @@ export default function RecipeDetails() {
   const instructions = getInstructions(meal)
   const favorite = isFavorite(meal.idMeal)
 
+  async function handleToggleFavorite() {
+    setSavingFavorite(true)
+    setFavoriteError('')
+    try {
+      await toggleFavorite(meal)
+    } catch (requestError) {
+      setFavoriteError(requestError.message)
+    } finally {
+      setSavingFavorite(false)
+    }
+  }
+
   return (
     <main className="page-main recipe-detail container">
       <button className="back-link" type="button" onClick={() => navigate(-1)}><ArrowLeft size={17} /> Back to recipes</button>
@@ -45,9 +83,10 @@ export default function RecipeDetails() {
           <span className="eyebrow">{[meal.strArea, meal.strCategory].filter(Boolean).join(' · ') || 'A RECIPE TO LOVE'}</span>
           <h1>{meal.strMeal}</h1>
           <p>Something delicious to make and share. Gather your ingredients, take your time, and enjoy.</p>
-          <button className={`button ${favorite ? 'button-saved' : 'button-primary'}`} type="button" onClick={() => toggleFavorite(meal)}>
+          <button className={`button ${favorite ? 'button-saved' : 'button-primary'}`} type="button" onClick={handleToggleFavorite} disabled={!ready || savingFavorite}>
             <Heart size={17} fill={favorite ? 'currentColor' : 'none'} />{favorite ? 'Saved to favorites' : 'Save this recipe'}
           </button>
+          {favoriteError && <p className="favorite-detail-error" role="alert">{favoriteError}</p>}
           <div className="detail-links">
             {meal.strSource && <a href={meal.strSource} target="_blank" rel="noreferrer"><ExternalLink size={15} /> Original source</a>}
             {meal.strYoutube && <a href={meal.strYoutube} target="_blank" rel="noreferrer"><Youtube size={16} /> Watch on YouTube</a>}
